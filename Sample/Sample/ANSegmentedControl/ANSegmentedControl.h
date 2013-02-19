@@ -17,5 +17,6 @@
 -(void)setSelectedSegment:(NSInteger)newSegment animate:(bool)animate;
 @property CGFloat fastAnimationDuration;
 @property CGFloat slowAnimationDuration;
+@property (nonatomic, retain) NSFont *labelFont;
 
 @end

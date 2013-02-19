@@ -71,6 +71,7 @@
     if( self )
     {
         [self setDefaultDurations];
+        [self setLabelFont:[NSFont systemFontOfSize:13.0f]];
     }
     return self;
 }
@@ -87,9 +88,17 @@
 	self = [super initWithCoder:aDecoder];
 	[unarchiver setClass:oldClass forClassName:NSStringFromClass(oldClass)];
     
-    [self setDefaultDurations]; 
+    [self setDefaultDurations];
+    [self setLabelFont:[NSFont systemFontOfSize:13.0f]];
 	
 	return self;
+}
+
+- (void)dealloc
+{
+    [self setLabelFont:nil];
+    
+    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -114,6 +123,17 @@
                                 respectFlipped:YES
                                          hints:nil];
 }
+
+- (void)drawCenteredLabel:(NSString *)label inFrame:(NSRect)frame attributes:(NSDictionary *)attributes
+{
+    NSSize labelSize = [label sizeWithAttributes:attributes];
+    CGRect rect = NSMakeRect(frame.origin.x + (frame.size.width - labelSize.width) * 0.50f,
+                             frame.origin.y + (frame.size.height - labelSize.height) * 0.50f - 1.0f, // Subtract a pixel to make it look centered
+                             labelSize.width,
+                             labelSize.height);
+    [label drawInRect:rect withAttributes:attributes];
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {    
 	NSRect rect = [self bounds];
@@ -125,17 +145,28 @@
 
 - (void)drawSegment:(NSInteger)segment inFrame:(NSRect)frame withView:(NSView *)controlView
 {
-    float imageFraction;
-    
-    if ([[self window] isKeyWindow]) {
-        imageFraction = .5;
-    } else {
-        imageFraction = .2;
-    }
-    
     NSImage *image = [self imageForSegment:segment];
-    [[NSGraphicsContext currentContext] setImageInterpolation: NSImageInterpolationHigh];
-    [self drawCenteredImage:image inFrame:frame imageFraction:imageFraction];
+    NSString *label = [self labelForSegment:segment];
+    
+    if (label != nil)
+    {
+        NSDictionary *attributes = @{ NSFontAttributeName : self.labelFont, NSForegroundColorAttributeName : [NSColor colorWithDeviceWhite:0.0f alpha:0.50f] };
+        [self drawCenteredLabel:label inFrame:frame attributes:attributes];
+    }
+    else
+    {
+        float imageFraction;
+        
+        if ([[self window] isKeyWindow]) {
+            imageFraction = .5;
+        } else {
+            imageFraction = .2;
+        }
+        
+        [[NSGraphicsContext currentContext] setImageInterpolation: NSImageInterpolationHigh];
+        
+        [self drawCenteredImage:image inFrame:frame imageFraction:imageFraction];
+    }
 }
 
 - (void)drawBackgroud:(NSRect)rect
@@ -226,8 +257,19 @@
 	[path strokeInside];
     
     int newSegment = (int)round(location.x / width);
+    
     NSImage *image = [self imageForSegment:newSegment];
-    [self drawCenteredImage:image inFrame:knobRect imageFraction:imageFraction];
+    NSString *label = [self labelForSegment:newSegment];
+    
+    if (label != nil)
+    {
+        NSDictionary *attributes = @{ NSFontAttributeName : self.labelFont, NSForegroundColorAttributeName : [NSColor blackColor] };
+        [self drawCenteredLabel:label inFrame:knobRect attributes:attributes];
+    }
+    else
+    {
+        [self drawCenteredImage:image inFrame:knobRect imageFraction:imageFraction];
+    }
 
 #if ! __has_feature(objc_arc)
     [gradient release];
