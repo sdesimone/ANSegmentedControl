@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 
 
+typedef NS_ENUM(NSUInteger, ANSegmentedControlStyle) {
+    ANSegmentedControlStyleWithGradient = 0,
+    ANSegmentedControlStylePlain
+};
+
 @interface ANSegmentedControl : NSSegmentedControl <NSAnimationDelegate> {
 @private
     NSPoint location;
@@ -18,5 +23,7 @@
 @property CGFloat fastAnimationDuration;
 @property CGFloat slowAnimationDuration;
 @property (nonatomic, retain) NSFont *labelFont;
+
+@property (nonatomic) ANSegmentedControlStyle segmentedControlStyle;
 
 @end

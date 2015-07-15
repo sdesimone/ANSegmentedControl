@@ -59,6 +59,7 @@
 @implementation ANSegmentedControl
 @synthesize fastAnimationDuration=_fastAnimationDuration;
 @synthesize slowAnimationDuration=_slowAnimationDuration;
+@synthesize segmentedControlStyle=_segmentedControlStyle;
 
 
 + (Class)cellClass
@@ -107,6 +108,12 @@
     [self setFrameSize:NSMakeSize([self frame].size.width, 25)];
     location.x = [self frame].size.width / [self segmentCount] * [self selectedSegment];
     [[self cell] setTrackingMode:NSSegmentSwitchTrackingSelectOne];
+}
+
+- (void)setSegmentedControlStyle:(ANSegmentedControlStyle)segmentedControlStyle
+{
+    _segmentedControlStyle = segmentedControlStyle;
+    [self setNeedsDisplay:YES];
 }
 
 -(void)drawCenteredImage:(NSImage*)image inFrame:(NSRect)frame imageFraction:(float)imageFraction
@@ -172,42 +179,55 @@
 - (void)drawBackgroud:(NSRect)rect
 {
 	CGFloat radius = 3.5;
-    NSGradient *gradient;
+    NSGradient *gradient = nil;
+    NSShadow *dropShadow = nil;
     NSColor *frameColor;
-
+    
     NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:rect
-                                                         xRadius:radius 
+                                                         xRadius:radius
                                                          yRadius:radius];
-    
-    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];   
-    
-    if ([[self window] isKeyWindow]) {
-        gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.75 alpha:1.0]
-                                                 endingColor:[NSColor colorWithCalibratedWhite:.6 alpha:1.0]];
+
+    if (ANSegmentedControlStyleWithGradient == self.segmentedControlStyle) {
         
-        frameColor = [NSColor colorWithCalibratedWhite:.37 alpha:1.0] ;
-    } else {
-        gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.8 alpha:1.0]
-                                                 endingColor:[NSColor colorWithCalibratedWhite:.77 alpha:1.0]];
-        frameColor = [NSColor colorWithCalibratedWhite:.68 alpha:1.0] ;
+        NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
+        
+        if ([[self window] isKeyWindow]) {
+            gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.75 alpha:1.0]
+                                                     endingColor:[NSColor colorWithCalibratedWhite:.6 alpha:1.0]];
+            
+            frameColor = [NSColor colorWithCalibratedWhite:.37 alpha:1.0] ;
+        } else {
+            gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.8 alpha:1.0]
+                                                     endingColor:[NSColor colorWithCalibratedWhite:.77 alpha:1.0]];
+            frameColor = [NSColor colorWithCalibratedWhite:.68 alpha:1.0] ;
+        }
+        
+        // シャドウ
+        [ctx saveGraphicsState];
+        dropShadow = [[NSShadow alloc] init];
+        [dropShadow setShadowOffset:NSMakeSize(0, -1.0)];
+        [dropShadow setShadowBlurRadius:1.0];
+        [dropShadow setShadowColor:[NSColor colorWithCalibratedWhite:.863 alpha:.75]];
+        [dropShadow set];
+        [path fill];
+        [ctx restoreGraphicsState];
+        
+        // 塗り
+        [gradient drawInBezierPath:path angle:-90];
+        
+        // 枠線
+        [frameColor setStroke];
+        [path strokeInside];
+    } else if (ANSegmentedControlStylePlain == self.segmentedControlStyle) {
+        
+        frameColor = [NSColor clearColor];
+        
+        [frameColor setFill];
+        [path fill];
+        
     }
     
-    // シャドウ
-    [ctx saveGraphicsState];
-    NSShadow *dropShadow = [[NSShadow alloc] init];
-    [dropShadow setShadowOffset:NSMakeSize(0, -1.0)];
-    [dropShadow setShadowBlurRadius:1.0];
-    [dropShadow setShadowColor:[NSColor colorWithCalibratedWhite:.863 alpha:.75]];
-	[dropShadow set];
-	[path fill];
-    [ctx restoreGraphicsState];
-    
-    // 塗り
-	[gradient drawInBezierPath:path angle:-90];
-    
-    // 枠線
-    [frameColor setStroke];
-	[path strokeInside];
+
     
     float segmentWidth = rect.size.width / [self segmentCount];
     float segmentHeight = rect.size.height;
@@ -228,48 +248,61 @@
 - (void)drawKnob:(NSRect)rect
 {
 	CGFloat radius = 3;
-    NSGradient *gradient;
+    NSGradient *gradient = nil;
     float imageFraction;
     NSColor *frameColor;
-    
-    if ([[self window] isKeyWindow]) {
-        gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.68 alpha:1.0]
-                                                 endingColor:[NSColor colorWithCalibratedWhite:.91 alpha:1.0]];   
-        imageFraction = 1.0;
-        frameColor = [NSColor colorWithCalibratedWhite:.37 alpha:1.0] ;
-    } else {
-        gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.76 alpha:1.0]
-                                                 endingColor:[NSColor colorWithCalibratedWhite:.90 alpha:1.0]];   
-        imageFraction = .25; 
-        frameColor = [NSColor colorWithCalibratedWhite:.68 alpha:1.0] ;
-    }
     
     CGFloat width = rect.size.width / [self segmentCount];
     CGFloat height = rect.size.height;
     NSRect knobRect=NSMakeRect(location.x, rect.origin.y, width, height);
     NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:  knobRect
-                                                         xRadius:radius 
+                                                         xRadius:radius
                                                          yRadius:radius];
-    // 塗り
-	[gradient drawInBezierPath:path angle:-90];
-    // 枠線
-    [frameColor setStroke];
-	[path strokeInside];
     
-    int newSegment = (int)round(location.x / width);
+    if (ANSegmentedControlStyleWithGradient == self.segmentedControlStyle) {
     
-    NSImage *image = [self imageForSegment:newSegment];
-    NSString *label = [self labelForSegment:newSegment];
-    
-    if (label != nil)
-    {
-        NSDictionary *attributes = @{ NSFontAttributeName : self.labelFont, NSForegroundColorAttributeName : [NSColor blackColor] };
-        [self drawCenteredLabel:label inFrame:knobRect attributes:attributes];
+        if ([[self window] isKeyWindow]) {
+            gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.68 alpha:1.0]
+                                                     endingColor:[NSColor colorWithCalibratedWhite:.91 alpha:1.0]];   
+            imageFraction = 1.0;
+            frameColor = [NSColor colorWithCalibratedWhite:.37 alpha:1.0] ;
+        } else {
+            gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:.76 alpha:1.0]
+                                                     endingColor:[NSColor colorWithCalibratedWhite:.90 alpha:1.0]];   
+            imageFraction = .25; 
+            frameColor = [NSColor colorWithCalibratedWhite:.68 alpha:1.0] ;
+        }
+        
+        // 塗り
+        [gradient drawInBezierPath:path angle:-90];
+        // 枠線
+        [frameColor setStroke];
+        [path strokeInside];
+        
+        int newSegment = (int)round(location.x / width);
+        
+        NSImage *image = [self imageForSegment:newSegment];
+        NSString *label = [self labelForSegment:newSegment];
+        
+        if (label != nil) {
+            
+            NSDictionary *attributes = @{ NSFontAttributeName : self.labelFont, NSForegroundColorAttributeName : [NSColor blackColor] };
+            [self drawCenteredLabel:label inFrame:knobRect attributes:attributes];
+            
+        } else {
+            [self drawCenteredImage:image inFrame:knobRect imageFraction:imageFraction];
+        }
+
+        
+    } else if (ANSegmentedControlStylePlain == self.segmentedControlStyle) {
+        
+        frameColor = [NSColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.3];
+        [frameColor setFill];
+        
+        [path fill];
+        
     }
-    else
-    {
-        [self drawCenteredImage:image inFrame:knobRect imageFraction:imageFraction];
-    }
+
 
 #if ! __has_feature(objc_arc)
     [gradient release];
