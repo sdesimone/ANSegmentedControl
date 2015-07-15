@@ -23,11 +23,13 @@
 
 - (IBAction)clickButton1:(id)sender 
 {
+    self.segment.segmentedControlStyle = ANSegmentedControlStyleWithGradient;
     [segment setSelectedSegment:0];
 }
 
 - (IBAction)clickButton2:(id)sender 
 {
+    self.segment.segmentedControlStyle = ANSegmentedControlStylePlain;
     [segment setSelectedSegment:1];
 }
 
