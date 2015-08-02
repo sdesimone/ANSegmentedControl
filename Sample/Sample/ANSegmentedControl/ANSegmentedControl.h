@@ -22,7 +22,7 @@ typedef NS_ENUM(NSUInteger, ANSegmentedControlStyle) {
 -(void)setSelectedSegment:(NSInteger)newSegment animate:(bool)animate;
 @property CGFloat fastAnimationDuration;
 @property CGFloat slowAnimationDuration;
-@property (nonatomic, retain) NSFont *labelFont;
+@property (nonatomic, strong) NSFont *labelFont;
 
 @property (nonatomic) ANSegmentedControlStyle segmentedControlStyle;
 

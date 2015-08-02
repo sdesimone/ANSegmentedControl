@@ -95,12 +95,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-    [self setLabelFont:nil];
-    
-    [super dealloc];
-}
 
 - (void)awakeFromNib
 {

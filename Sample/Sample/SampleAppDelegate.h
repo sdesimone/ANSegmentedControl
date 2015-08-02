@@ -11,13 +11,13 @@
 
 @interface SampleAppDelegate : NSObject <NSApplicationDelegate> {
 @private
-    NSWindow *window;
+    NSWindow *__unsafe_unretained window;
     IBOutlet NSView *titleBar;
-    ANSegmentedControl *segment;
+    ANSegmentedControl *__unsafe_unretained segment;
 }
 
-@property (assign) IBOutlet NSWindow *window;
-@property (assign) IBOutlet ANSegmentedControl *segment;
+@property (unsafe_unretained) IBOutlet NSWindow *window;
+@property (unsafe_unretained) IBOutlet ANSegmentedControl *segment;
 
 - (IBAction)clickButton1:(id)sender;
 - (IBAction)clickButton2:(id)sender;

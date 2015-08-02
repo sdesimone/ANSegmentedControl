@@ -48,7 +48,6 @@
     [clipPath addClip];
     NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
     [gradient drawInRect:drawingRect angle:90];
-    [gradient release];
     [NSGraphicsContext restoreGraphicsState];
     
     NSColor *bottomColor = key ? COLOR_KEY_BOTTOM : COLOR_NOTKEY_BOTTOM;
@@ -98,11 +97,6 @@
 #pragma mark -
 #pragma mark Memory Management
 
-- (void)dealloc
-{
-    [_titleBarView release];
-    [super dealloc];
-}
 
 #pragma mark -
 #pragma mark NSWindow Overrides
@@ -126,8 +120,7 @@
 {
     if ((_titleBarView != newTitleBarView) && newTitleBarView) {
         [_titleBarView removeFromSuperview];
-        [_titleBarView release];
-        _titleBarView = [newTitleBarView retain];
+        _titleBarView = newTitleBarView;
         
         // Configure the view properties and add it as a subview of the theme frame
         NSView *contentView = [self contentView];
@@ -216,7 +209,7 @@
 - (void)_createTitlebarView
 {
     // Create the title bar view
-    self.titleBarView = [[[INTitlebarView alloc] initWithFrame:NSZeroRect] autorelease];
+    self.titleBarView = [[INTitlebarView alloc] initWithFrame:NSZeroRect];
 }
 
 - (void)_recalculateFrameForTitleBarView
