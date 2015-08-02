@@ -10,7 +10,7 @@
 
 @implementation NSShadow (MCAdditions)
 
-- (id)initWithColor:(NSColor *)color offset:(NSSize)offset blurRadius:(CGFloat)blur
+- (instancetype)initWithColor:(NSColor *)color offset:(NSSize)offset blurRadius:(CGFloat)blur
 {
 	self = [self init];
 	

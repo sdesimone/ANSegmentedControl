@@ -11,7 +11,7 @@
 @interface NSBezierPath (MCAdditions)
 
 + (NSBezierPath *)bezierPathWithCGPath:(CGPathRef)pathRef;
-- (CGPathRef)cgPath;
+@property (NS_NONATOMIC_IOSONLY, readonly) CGPathRef cgPath;
 
 - (NSBezierPath *)pathWithStrokeWidth:(CGFloat)strokeWidth;
 

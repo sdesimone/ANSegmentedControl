@@ -31,7 +31,7 @@
 - (void)_createTitlebarView;
 - (void)_recalculateFrameForTitleBarView;
 - (void)_layoutTrafficLightsAndContent;
-- (float)_minimumTitlebarHeight;
+@property (NS_NONATOMIC_IOSONLY, readonly) float _minimumTitlebarHeight;
 @end
 
 @implementation INTitlebarView
@@ -80,7 +80,7 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (id)init
+- (instancetype)init
 {
     if ((self = [super init])) {
         [self _doInitialWindowSetup];
@@ -125,7 +125,7 @@
         // Configure the view properties and add it as a subview of the theme frame
         NSView *contentView = [self contentView];
         NSView *themeFrame = [contentView superview];
-        NSView *firstSubview = [[themeFrame subviews] objectAtIndex:0];
+        NSView *firstSubview = [themeFrame subviews][0];
         [_titleBarView setAutoresizingMask:(NSViewMinYMargin | NSViewWidthSizable)];
         [self _recalculateFrameForTitleBarView];
         [themeFrame addSubview:_titleBarView positioned:NSWindowBelow relativeTo:firstSubview];

@@ -20,7 +20,7 @@
 
 @implementation ANKnobAnimation
 
-- (id)initWithStart:(int)begin end:(int)end
+- (instancetype)initWithStart:(int)begin end:(int)end
 {
     self = [super init];
     if( self )
@@ -36,7 +36,7 @@
     int x = start + progress * range;
     [super setCurrentProgress:progress];
     [delegate performSelector:@selector(setPosition:) 
-                   withObject:[NSNumber numberWithInteger:x]];
+                   withObject:@(x)];
 }
 
 - (void)setDelegate:(id)d
@@ -66,7 +66,7 @@
 {
 	return [ANSegmentedCell class];
 }
-- (id) initWithFrame:(NSRect)frameRect
+- (instancetype) initWithFrame:(NSRect)frameRect
 {
     self = [super initWithFrame:frameRect];
     if( self )
@@ -76,7 +76,7 @@
     }
     return self;
 }
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
 	if (![aDecoder isKindOfClass:[NSKeyedUnarchiver class]])
 		return [super initWithCoder:aDecoder];
