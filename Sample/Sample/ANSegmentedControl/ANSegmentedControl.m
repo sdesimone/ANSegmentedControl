@@ -11,6 +11,8 @@
 #import "NSBezierPath+MCAdditions.h"
 #import "NSShadow+MCAdditions.h"
 
+#define kControlHeigth 25
+
 @interface ANKnobAnimation : NSAnimation {
     int start, range;
     id delegate;
@@ -98,8 +100,8 @@
 
 - (void)awakeFromNib
 {
-    [self setBoundsSize:NSMakeSize([self bounds].size.width, 25)];
-    [self setFrameSize:NSMakeSize([self frame].size.width, 25)];
+    [self setBoundsSize:NSMakeSize([self bounds].size.width, kControlHeigth)];
+    [self setFrameSize:NSMakeSize([self frame].size.width, kControlHeigth)];
     location.x = [self frame].size.width / [self segmentCount] * [self selectedSegment];
     [[self cell] setTrackingMode:NSSegmentSwitchTrackingSelectOne];
 }
